@@ -65,6 +65,18 @@ const server = http.createServer((req, res) => {
     });
   }
 
+  else if (req.method === "GET" && req.url === "/select") {
+    db.query("SELECT * FROM students", (err, results) => {
+      if (err) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "Select failed: " + err.message }));
+      } else {
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify(results));
+      }
+    });
+  }
+
   else {
     res.writeHead(404);
     res.end("Not found");
