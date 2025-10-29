@@ -33,27 +33,32 @@ const server = http.createServer((req, res) => {
     let body = "";
     req.on("data", chunk => (body += chunk));
     req.on("end", () => {
-      const data = JSON.parse(body);
-      const sql = `INSERT INTO students (Name, Birthday, Address, Email, Viber, Course, Year_Graduated)
-                   VALUES (?, ?, ?, ?, ?, ?, ?)`;
-      const values = [
-        data.Name,
-        data.Birthday,
-        data.Address,
-        data.Email,
-        data.Viber,
-        data.Course,
-        data.Year_Graduated
-      ];
-      db.query(sql, values, (err, result) => {
-        if (err) {
-          res.writeHead(500, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ error: "Insert failed: " + err.message }));
-        } else {
-          res.writeHead(200, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ id: result.insertId }));
-        }
-      });
+      try {
+        const data = JSON.parse(body);
+        const sql = `INSERT INTO students (Name, Birthday, Address, Email, Viber, Course, Year_Graduated)
+                     VALUES (?, ?, ?, ?, ?, ?, ?)`;
+        const values = [
+          data.Name,
+          data.Birthday,
+          data.Address,
+          data.Email,
+          data.Viber,
+          data.Course,
+          data.Year_Graduated
+        ];
+        db.query(sql, values, (err, result) => {
+          if (err) {
+            res.writeHead(500, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ error: "Insert failed: " + err.message }));
+          } else {
+            res.writeHead(200, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ id: result.insertId }));
+          }
+        });
+      } catch (parseError) {
+        res.writeHead(400, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "Invalid JSON: " + parseError.message }));
+      }
     });
   }
 
@@ -94,7 +99,7 @@ const server = http.createServer((req, res) => {
     res.end("Not found");
   }
 });
-const PORT = process.env.DB_PORT;
+const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
 });

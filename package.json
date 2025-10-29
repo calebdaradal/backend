@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --webpack",
-    "build": "next build --webpack",
-    "start": "next start",
+    "dev": "node server.js",
+    "build": "echo 'No build step needed'",
+    "start": "node server.js",
     "lint": "eslint"
   },
   "dependencies": {
