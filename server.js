@@ -17,6 +17,18 @@ db.connect(err => {
 })
 
 const server = http.createServer((req, res) => {
+  // CORS headers
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,DELETE,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  // Preflight request handling
+  if (req.method === "OPTIONS") {
+    res.writeHead(204);
+    res.end();
+    return;
+  }
+
   if (req.method === "POST" && req.url === "/insert") {
     let body = "";
     req.on("data", chunk => (body += chunk));
@@ -35,11 +47,11 @@ const server = http.createServer((req, res) => {
       ];
       db.query(sql, values, (err, result) => {
         if (err) {
-          res.writeHead(500);
-          res.end("Insert failed: " + err.message);
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "Insert failed: " + err.message }));
         } else {
-          res.writeHead(200);
-          res.end("Inserted student with ID: " + result.insertId);
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ id: result.insertId }));
         }
       });
     });
